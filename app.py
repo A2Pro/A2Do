@@ -3,12 +3,15 @@ from pymongo import MongoClient
 from datetime import datetime, timedelta
 from bson.objectid import ObjectId
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.urandom(24)
 
-
-client = MongoClient("mongodb://a2pro:Eight63teal@192.168.0.50:27017/admin")
+#Make a file called .env, and set MONGODB_CONNECTIONSTRING_ = your connection string.
+client = MongoClient(os.getenv("MONGODB_CONNECTION_STRING"))
 db = client['task_scheduler']
 tasks_collection = db['tasks']
 
