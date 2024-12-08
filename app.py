@@ -7,7 +7,7 @@ import os
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.urandom(24)
 
-# MongoDB setup
+# MongoDB 
 client = MongoClient('mongodb://localhost:27017/')
 db = client['task_scheduler']
 tasks_collection = db['tasks']
