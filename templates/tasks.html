@@ -48,28 +48,28 @@
         <h3 class="mt-4">📋 Your Tasks</h3>
         <div class="list-group">
             {% for task in tasks %}
-                <div class="list-group-item {% if task.is_completed %}list-group-item-success{% endif %}">
+                <div class="list-group-item {% if task['is_completed'] %}list-group-item-success{% endif %}">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h5 class="mb-1">{{ task.title }}</h5>
-                            <p class="mb-1">{{ task.description }}</p>
+                            <h5 class="mb-1">{{ task['title'] }}</h5>
+                            <p class="mb-1">{{ task['description'] }}</p>
                             <small>
-                                Starts: {{ task.start_date.strftime('%Y-%m-%d %H:%M') }}<br>
+                                Starts: {{ task['start_date'].strftime('%Y-%m-%d %H:%M') }}<br>
                                 Estimated Time: 
-                                {% if task.estimated_time >= 60 %}
-                                    {{ task.estimated_time // 60 }}h 
+                                {% if task['estimated_time'] >= 60 %}
+                                    {{ task['estimated_time'] // 60 }}h 
                                 {% endif %}
-                                {% if task.estimated_time % 60 != 0 %}
-                                    {{ task.estimated_time % 60 }}m
+                                {% if task['estimated_time'] % 60 != 0 %}
+                                    {{ task['estimated_time'] % 60 }}m
                                 {% endif %}
                             </small>
                         </div>
                         <div>
-                            <a href="{{ url_for('update_task_status', task_id=task.id) }}" 
-                               class="btn btn-sm {% if task.is_completed %}btn-warning{% else %}btn-success{% endif %}">
-                                {% if task.is_completed %}↩️ Undo{% else %}✓ Complete{% endif %}
+                            <a href="{{ url_for('update_task_status', task_id=task['_id']) }}" 
+                               class="btn btn-sm {% if task['is_completed'] %}btn-warning{% else %}btn-success{% endif %}">
+                                {% if task['is_completed'] %}↩️ Undo{% else %}✓ Complete{% endif %}
                             </a>
-                            <a href="{{ url_for('delete_task', task_id=task.id) }}" 
+                            <a href="{{ url_for('delete_task', task_id=task['_id']) }}" 
                                class="btn btn-sm btn-danger">🗑️ Delete</a>
                         </div>
                     </div>

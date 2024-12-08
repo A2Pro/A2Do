@@ -13,33 +13,33 @@
         {% if tasks %}
             <div class="timeline">
                 {% for task in tasks|sort(attribute='start_date') %}
-                    <div class="timeline-item {% if task.is_completed %}completed{% endif %}">
+                    <div class="timeline-item {% if task['is_completed'] %}completed{% endif %}">
                         <div class="timeline-time">
-                            {{ task.start_date.strftime('%H:%M') }}
+                            {{ task['start_date'].strftime('%H:%M') }}
                         </div>
                         <div class="timeline-content">
                             <div class="d-flex justify-content-between align-items-start">
                                 <div>
-                                    <h5>{{ task.title }}</h5>
-                                    {% if task.description %}
-                                        <p class="mb-2">{{ task.description }}</p>
+                                    <h5>{{ task['title'] }}</h5>
+                                    {% if task['description'] %}
+                                        <p class="mb-2">{{ task['description'] }}</p>
                                     {% endif %}
                                     <small class="text-muted">
                                         Estimated time: 
-                                        {% if task.estimated_time >= 60 %}
-                                            {{ task.estimated_time // 60 }}h 
+                                        {% if task['estimated_time'] >= 60 %}
+                                            {{ task['estimated_time'] // 60 }}h 
                                         {% endif %}
-                                        {% if task.estimated_time % 60 != 0 %}
-                                            {{ task.estimated_time % 60 }}m
+                                        {% if task['estimated_time'] % 60 != 0 %}
+                                            {{ task['estimated_time'] % 60 }}m
                                         {% endif %}
                                     </small>
                                 </div>
                                 <div class="ms-3">
-                                    <a href="{{ url_for('update_task_status', task_id=task.id) }}" 
-                                       class="btn btn-sm {% if task.is_completed %}btn-warning{% else %}btn-success{% endif %}">
-                                        {% if task.is_completed %}↩️ Undo{% else %}✓ Complete{% endif %}
+                                    <a href="{{ url_for('update_task_status', task_id=task['_id']) }}" 
+                                       class="btn btn-sm {% if task['is_completed'] %}btn-warning{% else %}btn-success{% endif %}">
+                                        {% if task['is_completed'] %}↩️ Undo{% else %}✓ Complete{% endif %}
                                     </a>
-                                    <a href="{{ url_for('delete_task', task_id=task.id) }}" 
+                                    <a href="{{ url_for('delete_task', task_id=task['_id']) }}" 
                                        class="btn btn-sm btn-danger"
                                        onclick="return confirm('Are you sure you want to delete this task?')">
                                         🗑️

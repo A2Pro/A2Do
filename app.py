@@ -7,7 +7,7 @@ import os
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.urandom(24)
 
-# MongoDB 
+
 client = MongoClient("mongodb://a2pro:Eight63teal@192.168.0.50:27017/admin")
 db = client['task_scheduler']
 tasks_collection = db['tasks']
@@ -19,7 +19,7 @@ def index():
 @app.route('/tasks')
 def tasks():
     try:
-        # Get all tasks, sorted by start_date
+        
         tasks = list(tasks_collection.find().sort('start_date', 1))
         today = datetime.now().strftime('%Y-%m-%d')
         return render_template('tasks.html', tasks=tasks, today=today)
@@ -36,14 +36,14 @@ def scheduler():
         else:
             selected_date = datetime.now()
 
-        # Get the start and end of the selected month
+        
         start_date = selected_date.replace(day=1)
         if start_date.month == 12:
             end_date = start_date.replace(year=start_date.year + 1, month=1)
         else:
             end_date = start_date.replace(month=start_date.month + 1)
 
-        # Get all tasks for the selected month
+        
         tasks = list(tasks_collection.find({
             'start_date': {
                 '$gte': start_date,
@@ -51,7 +51,7 @@ def scheduler():
             }
         }).sort('start_date', 1))
 
-        # Calculate calendar dates
+        
         calendar_weeks = generate_calendar_dates(selected_date)
         
         return render_template('scheduler.html',
@@ -74,13 +74,13 @@ def add_task():
         estimated_hours = int(request.form.get('estimated_hours', 0))
         estimated_minutes = int(request.form.get('estimated_minutes', 0))
         
-        # Calculate total estimated time in minutes
+        
         total_estimated_minutes = (estimated_hours * 60) + estimated_minutes
         
-        # Create datetime object for start_date
+        
         start_datetime = datetime.strptime(f"{start_date} {start_time}", '%Y-%m-%d %H:%M')
         
-        # Create task document
+        
         task = {
             'title': title,
             'description': description,
@@ -90,7 +90,7 @@ def add_task():
             'created_at': datetime.utcnow()
         }
         
-        # Insert into MongoDB
+        
         result = tasks_collection.insert_one(task)
         
         if result.inserted_id:
@@ -110,7 +110,7 @@ def view_day(date):
         start_of_day = selected_date.replace(hour=0, minute=0, second=0)
         end_of_day = selected_date.replace(hour=23, minute=59, second=59)
         
-        # Query MongoDB for tasks on this day
+        
         tasks = list(tasks_collection.find({
             'start_date': {
                 '$gte': start_of_day,
@@ -128,10 +128,10 @@ def view_day(date):
 @app.route('/update_task_status/<task_id>')
 def update_task_status(task_id):
     try:
-        # Find the task and get its current status
+        
         task = tasks_collection.find_one({'_id': ObjectId(task_id)})
         if task:
-            # Toggle the is_completed status
+            
             new_status = not task.get('is_completed', False)
             tasks_collection.update_one(
                 {'_id': ObjectId(task_id)},
@@ -147,12 +147,14 @@ def update_task_status(task_id):
 @app.route('/delete_task/<task_id>')
 def delete_task(task_id):
     try:
+        print(f"Attempting to delete task with id: {task_id}")  
         result = tasks_collection.delete_one({'_id': ObjectId(task_id)})
         if result.deleted_count:
             flash('🗑️ Task deleted successfully!', 'success')
         else:
             flash('❌ Task not found', 'error')
     except Exception as e:
+        print(f"Error deleting task: {str(e)}")  
         flash('❌ Error deleting task: ' + str(e), 'error')
     return redirect(request.referrer or url_for('tasks'))
 
