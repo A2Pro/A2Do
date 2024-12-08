@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <h2>📅 Calendar View</h2>
+            <div>
+                <a href="{{ url_for('scheduler', date=(selected_date - timedelta(days=32)).strftime('%Y-%m-%d')) }}" 
+                   class="btn btn-outline-primary">◀ Previous Month</a>
+                <span class="mx-3 fw-bold">{{ selected_date.strftime('%B %Y') }}</span>
+                <a href="{{ url_for('scheduler', date=(selected_date + timedelta(days=32)).strftime('%Y-%m-%d')) }}" 
+                   class="btn btn-outline-primary">Next Month ▶</a>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <!-- Calendar Grid -->
+        <div class="calendar-grid mb-4">
+            <div class="row text-center fw-bold mb-2">
+                <div class="col">Monday</div>
+                <div class="col">Tuesday</div>
+                <div class="col">Wednesday</div>
+                <div class="col">Thursday</div>
+                <div class="col">Friday</div>
+                <div class="col">Saturday</div>
+                <div class="col">Sunday</div>
+            </div>
+            
+            {% for week in calendar_weeks %}
+                <div class="row g-0">
+                    {% for day in week %}
+                        <div class="col">
+                            {% if day %}
+                                {% set day_tasks = tasks|selectattr('start_date.date')|selectattr('start_date.date', 'eq', day.date())|list %}
+                                <div class="calendar-day position-relative {% if day.date() == today %}today{% endif %} 
+                                                      {% if day_tasks %}has-tasks{% endif %}"
+                                     onclick="window.location.href='{{ url_for('view_day', date=day.strftime('%Y-%m-%d')) }}'">
+                                    <div class="day-number">{{ day.day }}</div>
+                                    {% if day_tasks %}
+                                        <div class="task-count">
+                                            {{ day_tasks|length }} task{{ 's' if day_tasks|length != 1 }}
+                                        </div>
+                                        <div class="task-preview">
+                                            {% for task in day_tasks[:2]|sort(attribute='start_date') %}
+                                                <div class="task-item {% if task.is_completed %}completed{% endif %}" 
+                                                     title="{{ task.title }}">
+                                                    <span class="task-time">{{ task.start_date.strftime('%H:%M') }}</span>
+                                                    <span class="task-title">{{ task.title }}</span>
+                                                </div>
+                                            {% endfor %}
+                                            {% if day_tasks|length > 2 %}
+                                                <div class="more-tasks">+ {{ day_tasks|length - 2 }} more</div>
+                                            {% endif %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            {% else %}
+                                <div class="calendar-day empty"></div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<style>
+    .calendar-grid {
+        background-color: white;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    
+    .calendar-day {
+        min-height: 120px;
+        border: 1px solid #dee2e6;
+        padding: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+        background-color: white;
+    }
+    
+    .calendar-day:hover {
+        background-color: var(--primary-light);
+        transform: scale(1.02);
+        z-index: 1;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    
+    .calendar-day.today {
+        background-color: var(--accent-light);
+    }
+    
+    .calendar-day.empty {
+        background-color: #f8f9fa;
+        cursor: default;
+    }
+    
+    .calendar-day.has-tasks {
+        border-left: 4px solid var(--primary-color);
+    }
+    
+    .day-number {
+        font-weight: bold;
+        margin-bottom: 8px;
+        font-size: 1.1em;
+    }
+    
+    .task-count {
+        font-size: 0.8em;
+        color: var(--primary-color);
+        background-color: var(--primary-light);
+        padding: 2px 6px;
+        border-radius: 10px;
+        display: inline-block;
+        margin-bottom: 5px;
+    }
+    
+    .task-preview {
+        font-size: 0.8em;
+    }
+    
+    .task-item {
+        margin-bottom: 3px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        padding: 2px 4px;
+        border-radius: 3px;
+        background-color: rgba(33, 150, 243, 0.1);
+    }
+    
+    .task-item.completed {
+        background-color: rgba(76, 175, 80, 0.1);
+    }
+    
+    .task-time {
+        color: var(--primary-color);
+        font-weight: bold;
+        margin-right: 4px;
+    }
+    
+    .more-tasks {
+        font-size: 0.8em;
+        color: var(--primary-color);
+        text-align: center;
+        margin-top: 3px;
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[title]'))
+    var tooltipList = tooltipTriggerList.map(function(element) {
+        return new bootstrap.Tooltip(element)
+    });
+});
+</script>
+{% endblock %}

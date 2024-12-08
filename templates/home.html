@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-6 text-center">
+        <h1>Welcome! 👋</h1>
+        <p class="lead">Manage your tasks and schedule your day efficiently.</p>
+        <div class="mt-4">
+            <a href="{{ url_for('tasks') }}" class="btn btn-primary btn-lg me-2">View Tasks ✓</a>
+            <a href="{{ url_for('scheduler') }}" class="btn btn-accent btn-lg">Open Scheduler 📅</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

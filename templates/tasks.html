@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h2>✓ Task Manager</h2>
+    </div>
+    <div class="card-body">
+        <form action="{{ url_for('add_task') }}" method="POST" onsubmit="return validateTime()">
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">Task Title</label>
+                    <input type="text" name="title" class="form-control" placeholder="Enter task title" required>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label class="form-label">Start Date</label>
+                    <input type="date" name="start_date" class="form-control" required value="{{ today }}">
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label class="form-label">Start Time</label>
+                    <input type="text" name="start_time" id="timeInput" class="form-control" 
+                           placeholder="HH:MM" pattern="([01]?[0-9]|2[0-3]):[0-5][0-9]"
+                           title="Enter time in 24-hour format (HH:MM)" required>
+                    <div class="invalid-feedback">
+                        Please enter a valid time (00:00 to 23:59)
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label class="form-label">Estimated Time</label>
+                    <div class="row">
+                        <div class="col-6">
+                            <input type="number" name="estimated_hours" class="form-control" 
+                                   min="0" max="24" placeholder="Hours" required value="0">
+                        </div>
+                        <div class="col-6">
+                            <input type="number" name="estimated_minutes" class="form-control" 
+                                   min="0" max="59" placeholder="Mins" required value="0">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Description</label>
+                <textarea name="description" class="form-control" placeholder="Task details..."></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Task ➕</button>
+        </form>
+
+        <h3 class="mt-4">📋 Your Tasks</h3>
+        <div class="list-group">
+            {% for task in tasks %}
+                <div class="list-group-item {% if task.is_completed %}list-group-item-success{% endif %}">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="mb-1">{{ task.title }}</h5>
+                            <p class="mb-1">{{ task.description }}</p>
+                            <small>
+                                Starts: {{ task.start_date.strftime('%Y-%m-%d %H:%M') }}<br>
+                                Estimated Time: 
+                                {% if task.estimated_time >= 60 %}
+                                    {{ task.estimated_time // 60 }}h 
+                                {% endif %}
+                                {% if task.estimated_time % 60 != 0 %}
+                                    {{ task.estimated_time % 60 }}m
+                                {% endif %}
+                            </small>
+                        </div>
+                        <div>
+                            <a href="{{ url_for('update_task_status', task_id=task.id) }}" 
+                               class="btn btn-sm {% if task.is_completed %}btn-warning{% else %}btn-success{% endif %}">
+                                {% if task.is_completed %}↩️ Undo{% else %}✓ Complete{% endif %}
+                            </a>
+                            <a href="{{ url_for('delete_task', task_id=task.id) }}" 
+                               class="btn btn-sm btn-danger">🗑️ Delete</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<script>
+function validateTime() {
+    const timeInput = document.getElementById('timeInput');
+    const timeValue = timeInput.value;
+    const timePattern = /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/;
+    
+    if (!timePattern.test(timeValue)) {
+        timeInput.classList.add('is-invalid');
+        return false;
+    }
+    
+    timeInput.classList.remove('is-invalid');
+    return true;
+}
+</script>
+{% endblock %}

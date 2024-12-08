@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <h2>📅 {{ selected_date.strftime('%B %d, %Y') }}</h2>
+            <a href="{{ url_for('scheduler') }}" class="btn btn-outline-primary">
+                ◀ Back to Calendar
+            </a>
+        </div>
+    </div>
+    <div class="card-body">
+        {% if tasks %}
+            <div class="timeline">
+                {% for task in tasks|sort(attribute='start_date') %}
+                    <div class="timeline-item {% if task.is_completed %}completed{% endif %}">
+                        <div class="timeline-time">
+                            {{ task.start_date.strftime('%H:%M') }}
+                        </div>
+                        <div class="timeline-content">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h5>{{ task.title }}</h5>
+                                    {% if task.description %}
+                                        <p class="mb-2">{{ task.description }}</p>
+                                    {% endif %}
+                                    <small class="text-muted">
+                                        Estimated time: 
+                                        {% if task.estimated_time >= 60 %}
+                                            {{ task.estimated_time // 60 }}h 
+                                        {% endif %}
+                                        {% if task.estimated_time % 60 != 0 %}
+                                            {{ task.estimated_time % 60 }}m
+                                        {% endif %}
+                                    </small>
+                                </div>
+                                <div class="ms-3">
+                                    <a href="{{ url_for('update_task_status', task_id=task.id) }}" 
+                                       class="btn btn-sm {% if task.is_completed %}btn-warning{% else %}btn-success{% endif %}">
+                                        {% if task.is_completed %}↩️ Undo{% else %}✓ Complete{% endif %}
+                                    </a>
+                                    <a href="{{ url_for('delete_task', task_id=task.id) }}" 
+                                       class="btn btn-sm btn-danger"
+                                       onclick="return confirm('Are you sure you want to delete this task?')">
+                                        🗑️
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-center py-5">
+                <h4>No tasks scheduled for this day</h4>
+                <p class="text-muted">Add tasks from the Task Manager page</p>
+                <a href="{{ url_for('tasks') }}" class="btn btn-primary mt-2">
+                    Go to Task Manager
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    .timeline {
+        position: relative;
+        padding: 20px 0;
+    }
+    
+    .timeline::before {
+        content: '';
+        position: absolute;
+        left: 80px;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: var(--primary-color);
+    }
+    
+    .timeline-item {
+        position: relative;
+        margin-bottom: 30px;
+        padding-left: 100px;
+    }
+    
+    .timeline-item.completed .timeline-content {
+        background-color: #e8f5e9;
+        border-left-color: #4caf50;
+    }
+    
+    .timeline-time {
+        position: absolute;
+        left: 0;
+        width: 80px;
+        text-align: right;
+        padding-right: 20px;
+        color: var(--primary-color);
+        font-weight: bold;
+    }
+    
+    .timeline-content {
+        background: white;
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        border-left: 4px solid var(--primary-color);
+    }
+</style>
+{% endblock %}
